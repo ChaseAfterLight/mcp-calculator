@@ -1,19 +1,16 @@
 {
   "mcpServers": {
-    "local-stdio-calculator": {
-      "type": "stdio",
+    "species-card-generator": {
       "command": "python",
-      "args": ["-m", "calculator"]
+      "args": ["mcp_servers/species_card_generator.py"]
     },
-    "remote-sse-server": {
-      "type": "sse",
-      "url": "https://api.example.com/sse",
-      "disabled": true
+    "species-encyclopedia": {
+      "command": "python", 
+      "args": ["mcp_servers/species_encyclopedia_mcp.py"]
     },
-    "remote-http-server": {
-      "type": "http",
-      "url": "https://api.example.com/mcp",
-      "disabled": true
+    "species-card-email-service": {
+      "command": "python",
+      "args": ["mcp_servers/species_card_email_service.py"]
     }
   }
 }

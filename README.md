@@ -1,115 +1,75 @@
-# MCP Sample Project | MCP 示例项目
+# 物种图鉴 MCP 项目
 
-A powerful interface for extending AI capabilities through remote control, calculations, email operations, knowledge search, and more.
+一个基于 MCP 协议的物种识别和图鉴管理系统。
 
-一个强大的接口，用于通过远程控制、计算、邮件操作、知识搜索等方式扩展AI能力。
+## 功能特性
 
-## Overview | 概述
+- 🔍 **物种识别** - AI 识别动植物并生成图鉴卡片
+- 📚 **图鉴管理** - 智能存储和查询已识别物种
+- 🏆 **积分系统** - 发现新物种获得积分奖励
+- 📧 **邮件分享** - 将图鉴卡片发送到邮箱
 
-MCP (Model Context Protocol) is a protocol that allows servers to expose tools that can be invoked by language models. Tools enable models to interact with external systems, such as querying databases, calling APIs, or performing computations. Each tool is uniquely identified by a name and includes metadata describing its schema.
+## 项目结构
 
-MCP（模型上下文协议）是一个允许服务器向语言模型暴露可调用工具的协议。这些工具使模型能够与外部系统交互，例如查询数据库、调用API或执行计算。每个工具都由一个唯一的名称标识，并包含描述其模式的元数据。
+```
+├── mcp_servers/           # MCP 服务器
+│   ├── species_card_generator.py      # 图鉴卡片生成
+│   ├── species_encyclopedia_mcp.py    # 图鉴管理和积分
+│   └── species_card_email_service.py  # 邮件服务
+├── utils/                 # 工具模块
+│   ├── card_renderer.py   # 卡片渲染器
+│   └── email_sender.py    # 邮件发送器
+├── cards/                 # 图鉴数据
+│   ├── index.json         # 物种索引
+│   ├── user_scores.json   # 用户积分
+│   ├── images/            # 卡片图片
+│   └── metadata/          # 物种详细信息
+├── templates/             # 卡片模板
+└── docs/                  # 文档
+```
 
-## Features | 特性
+## 快速开始
 
-- 🔌 Bidirectional communication between AI and external tools | AI与外部工具之间的双向通信
-- 🔄 Automatic reconnection with exponential backoff | 具有指数退避的自动重连机制
-- 📊 Real-time data streaming | 实时数据流传输
-- 🛠️ Easy-to-use tool creation interface | 简单易用的工具创建接口
-- 🔒 Secure WebSocket communication | 安全的WebSocket通信
-- ⚙️ Multiple transport types support (stdio/sse/http) | 支持多种传输类型（stdio/sse/http）
-
-## Quick Start | 快速开始
-
-1. Install dependencies | 安装依赖:
+1. 安装依赖：
 ```bash
 pip install -r requirements.txt
+playwright install chromium
 ```
 
-2. Set up environment variables | 设置环境变量:
-```bash
-export MCP_ENDPOINT=<your_mcp_endpoint>
-```
-
-3. Run the calculator example | 运行计算器示例:
-```bash
-python mcp_pipe.py calculator.py
-```
-
-Or run all configured servers | 或运行所有配置的服务:
+2. 启动所有 MCP 服务：
 ```bash
 python mcp_pipe.py
 ```
 
-*Requires `mcp_config.json` configuration file with server definitions (supports stdio/sse/http transport types)*
+## MCP 服务
 
-*需要 `mcp_config.json` 配置文件定义服务器（支持 stdio/sse/http 传输类型）*
+### 1. 物种图鉴管理 (species-encyclopedia)
+- `register_species()` - 智能注册物种（自动检查重复+积分）
+- `search_species()` - 搜索图鉴
+- `get_my_stats()` - 查询积分统计
 
-## Project Structure | 项目结构
+### 2. 图鉴卡片生成 (species-card-generator)  
+- `generate_species_card()` - 生成宝可梦风格图鉴卡片
 
-- `mcp_pipe.py`: Main communication pipe that handles WebSocket connections and process management | 处理WebSocket连接和进程管理的主通信管道
-- `calculator.py`: Example MCP tool implementation for mathematical calculations | 用于数学计算的MCP工具示例实现
-- `requirements.txt`: Project dependencies | 项目依赖
+### 3. 邮件服务 (species-card-email-service)
+- `send_species_card_email()` - 发送图鉴卡片到邮箱
 
-## Config-driven Servers | 通过配置驱动的服务
+## 积分规则
 
-编辑 `mcp_config.json` 文件来配置服务器列表（也可设置 `MCP_CONFIG` 环境变量指向其他配置文件）。
+- 1-2星物种：+10 分
+- 3星物种：+20 分  
+- 4星物种：+30 分
+- 5星物种：+50 分
+- 重复识别：+0 分
 
-配置说明：
-- 无参数时启动所有配置的服务（自动跳过 `disabled: true` 的条目）
-- 有参数时运行单个本地脚本文件
-- `type=stdio` 直接启动；`type=sse/http` 通过 `python -m mcp_proxy` 代理
+## 使用流程
 
-## Creating Your Own MCP Tools | 创建自己的MCP工具
-
-Here's a simple example of creating an MCP tool | 以下是一个创建MCP工具的简单示例:
-
-```python
-from mcp.server.fastmcp import FastMCP
-
-mcp = FastMCP("YourToolName")
-
-@mcp.tool()
-def your_tool(parameter: str) -> dict:
-    """Tool description here"""
-    # Your implementation
-    return {"success": True, "result": result}
-
-if __name__ == "__main__":
-    mcp.run(transport="stdio")
 ```
-
-## Use Cases | 使用场景
-
-- Mathematical calculations | 数学计算
-- Email operations | 邮件操作
-- Knowledge base search | 知识库搜索
-- Remote device control | 远程设备控制
-- Data processing | 数据处理
-- Custom tool integration | 自定义工具集成
-
-## Requirements | 环境要求
-
-- Python 3.7+
-- websockets>=11.0.3
-- python-dotenv>=1.0.0
-- mcp>=1.8.1
-- pydantic>=2.11.4
-- mcp-proxy>=0.8.2
-
-## Contributing | 贡献指南
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-欢迎贡献代码！请随时提交Pull Request。
-
-## License | 许可证
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-本项目采用MIT许可证 - 详情请查看LICENSE文件。
-
-## Acknowledgments | 致谢
-
-- Thanks to all contributors who have helped shape this project | 感谢所有帮助塑造这个项目的贡献者
-- Inspired by the need for extensible AI capabilities | 灵感来源于对可扩展AI能力的需求
+用户上传照片 → AI识别物种 → register_species()
+    ↓
+自动判断：
+  - 新物种 → 添加图鉴 + 奖励积分 + generate_species_card()
+  - 已存在 → 返回已有信息
+    ↓
+可选：send_species_card_email() 分享到邮箱
+```
