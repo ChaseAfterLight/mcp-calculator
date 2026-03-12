@@ -1,0 +1,20 @@
+{
+  "chinese_name": "非洲象",
+  "latin_name": "Loxodonta africana",
+  "features": [
+    "体型巨大",
+    "长鼻子",
+    "大耳朵",
+    "群居生活"
+  ],
+  "category": "animal",
+  "classification": {},
+  "habitat": "",
+  "observation_season": "",
+  "protection_level": "",
+  "fun_fact": "非洲象是陆地上最大的动物，它们的大耳朵不仅能听声音，还能像扇子一样散热呢！",
+  "image_path": "cards\\images\\非洲象_A002.png",
+  "rarity": 4,
+  "card_id": "A002",
+  "generated_at": "2026-03-10T23:39:30.062566"
+}

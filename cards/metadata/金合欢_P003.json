@@ -1,0 +1,20 @@
+{
+  "chinese_name": "金合欢",
+  "latin_name": "Vachellia farnesiana",
+  "features": [
+    "羽状复叶",
+    "橙黄色绒球状花",
+    "叶片椭圆形",
+    "叶脉清晰"
+  ],
+  "category": "plant",
+  "classification": {},
+  "habitat": "",
+  "observation_season": "",
+  "protection_level": "",
+  "fun_fact": "金合欢的花香浓郁，常被用来提取香精制作香水。",
+  "image_path": "cards\\images\\金合欢_P003.png",
+  "rarity": 3,
+  "card_id": "P003",
+  "generated_at": "2026-03-10T23:36:21.306026"
+}

@@ -1,0 +1,198 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
+}
+
+.card {
+    width: 800px;
+    height: 1200px;
+    border-radius: 20px;
+    padding: 30px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    position: relative;
+    overflow: hidden;
+}
+
+/* 分类配色 */
+.card.plant {
+    background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+}
+
+.card.animal {
+    background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+}
+
+.card.mineral {
+    background: linear-gradient(135deg, #f5f5f5 0%, #e0e0e0 100%);
+}
+
+/* 头部区域 */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.card-id {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 24px;
+    font-weight: bold;
+    color: #333;
+}
+
+.category-icon {
+    font-size: 32px;
+}
+
+.category-label {
+    font-size: 18px;
+    color: #666;
+}
+
+.rarity {
+    font-size: 20px;
+}
+
+/* 照片区域 */
+.photo-section {
+    width: 700px;
+    height: 300px;
+    margin: 0 auto 20px;
+    border-radius: 15px;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.species-photo {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.placeholder-icon {
+    font-size: 80px;
+    opacity: 0.4;
+}
+
+/* 名称区域 */
+.name-section {
+    text-align: center;
+    margin-bottom: 20px;
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.7);
+    border-radius: 10px;
+}
+
+.chinese-name {
+    font-size: 42px;
+    font-weight: bold;
+    color: #2c3e50;
+    margin-bottom: 10px;
+}
+
+.latin-name {
+    font-size: 22px;
+    font-style: italic;
+    color: #7f8c8d;
+}
+
+/* 信息区域 */
+.info-section {
+    margin-bottom: 15px;
+    padding: 18px;
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: 10px;
+}
+
+.section-title {
+    font-size: 22px;
+    font-weight: bold;
+    color: #34495e;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid rgba(0, 0, 0, 0.1);
+}
+
+.features-list {
+    list-style: none;
+    padding-left: 0;
+}
+
+.features-list li {
+    font-size: 18px;
+    color: #2c3e50;
+    margin-bottom: 10px;
+    padding-left: 25px;
+    position: relative;
+    line-height: 1.5;
+}
+
+.features-list li:before {
+    content: "•";
+    position: absolute;
+    left: 8px;
+    color: #27ae60;
+    font-weight: bold;
+    font-size: 20px;
+}
+
+/* 信息行 */
+.info-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 18px;
+    margin-bottom: 12px;
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: 8px;
+    font-size: 18px;
+}
+
+.info-row .icon {
+    font-size: 22px;
+}
+
+.info-row .label {
+    font-weight: bold;
+    color: #34495e;
+}
+
+.info-row .value {
+    color: #2c3e50;
+}
+
+.info-row.warning {
+    background: rgba(255, 243, 224, 0.9);
+}
+
+/* 趣味知识区域 */
+.fun-fact-section {
+    margin-top: 15px;
+    padding: 18px;
+    background: rgba(255, 255, 255, 0.85);
+    border-radius: 10px;
+    border-left: 5px solid #f39c12;
+}
+
+.fun-fact-text {
+    font-size: 18px;
+    color: #2c3e50;
+    line-height: 1.7;
+}

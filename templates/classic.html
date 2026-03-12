@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ chinese_name }} - 物种图鉴</title>
+    <style>
+        {{ css_content }}
+    </style>
+</head>
+<body>
+    <div class="card {{ category }}">
+        <div class="header">
+            <div class="card-id">
+                <span class="category-icon">{{ category_icon }}</span>
+                <span class="id-text">#{{ card_id }}</span>
+            </div>
+            <div class="category-label">{{ category_label }}</div>
+            <div class="rarity">
+                {% for i in range(rarity) %}⭐{% endfor %}
+            </div>
+        </div>
+
+        <div class="photo-section">
+            {% if image_path %}
+            <img src="{{ image_path }}" alt="{{ chinese_name }}" class="species-photo">
+            {% else %}
+            <div class="placeholder-icon">{{ category_icon }}</div>
+            {% endif %}
+        </div>
+
+        <div class="name-section">
+            <h1 class="chinese-name">{{ chinese_name }}</h1>
+            <p class="latin-name">{{ latin_name }}</p>
+        </div>
+
+        <div class="info-section">
+            <div class="section-title">🔍 识别特征</div>
+            <ul class="features-list">
+                {% for feature in features %}
+                <li>{{ feature }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        {% if habitat %}
+        <div class="info-row">
+            <span class="icon">📍</span>
+            <span class="label">分布：</span>
+            <span class="value">{{ habitat }}</span>
+        </div>
+        {% endif %}
+
+        {% if observation_season %}
+        <div class="info-row">
+            <span class="icon">📅</span>
+            <span class="label">观察期：</span>
+            <span class="value">{{ observation_season }}</span>
+        </div>
+        {% endif %}
+
+        {% if protection_level %}
+        <div class="info-row warning">
+            <span class="icon">⚠️</span>
+            <span class="label">保护：</span>
+            <span class="value">{{ protection_level }}</span>
+        </div>
+        {% endif %}
+
+        {% if fun_fact %}
+        <div class="fun-fact-section">
+            <div class="section-title">💡 趣味知识</div>
+            <p class="fun-fact-text">{{ fun_fact }}</p>
+        </div>
+        {% endif %}
+    </div>
+</body>
+</html>

@@ -1,0 +1,61 @@
+[
+  {
+    "card_id": "P001",
+    "chinese_name": "小叶榕",
+    "latin_name": "Ficus microcarpa",
+    "category": "plant",
+    "generated_at": "2026-03-10T23:25:42.572437",
+    "discovered_by": "default"
+  },
+  {
+    "card_id": "P002",
+    "chinese_name": "金合欢",
+    "latin_name": "Vachellia farnesiana",
+    "category": "plant",
+    "generated_at": "2026-03-10T23:36:18.479635",
+    "discovered_by": "default",
+    "card_generated": false
+  },
+  {
+    "card_id": "P003",
+    "chinese_name": "金合欢",
+    "latin_name": "Vachellia farnesiana",
+    "category": "plant",
+    "image_path": "cards\\images\\金合欢_P003.png",
+    "generated_at": "2026-03-10T23:36:21.307487"
+  },
+  {
+    "card_id": "P004",
+    "chinese_name": "茼蒿",
+    "latin_name": "Glebionis coronaria",
+    "category": "plant",
+    "generated_at": "2026-03-10T23:38:29.456524",
+    "discovered_by": "default",
+    "card_generated": false
+  },
+  {
+    "card_id": "P005",
+    "chinese_name": "茼蒿",
+    "latin_name": "Glebionis coronaria",
+    "category": "plant",
+    "image_path": "cards\\images\\茼蒿_P005.png",
+    "generated_at": "2026-03-10T23:38:32.480222"
+  },
+  {
+    "card_id": "A001",
+    "chinese_name": "非洲象",
+    "latin_name": "Loxodonta africana",
+    "category": "animal",
+    "generated_at": "2026-03-10T23:39:27.169318",
+    "discovered_by": "default",
+    "card_generated": false
+  },
+  {
+    "card_id": "A002",
+    "chinese_name": "非洲象",
+    "latin_name": "Loxodonta africana",
+    "category": "animal",
+    "image_path": "cards\\images\\非洲象_A002.png",
+    "generated_at": "2026-03-10T23:39:30.064215"
+  }
+]
