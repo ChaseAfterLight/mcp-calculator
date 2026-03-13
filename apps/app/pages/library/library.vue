@@ -195,7 +195,7 @@ page {
   padding: 10px;
   box-shadow: inset 0 0 10px rgba(0,0,0,0.3);
   position: relative;
-  overflow: hidden;
+  /* 移除 overflow: hidden 以防止渲染模糊 */
   height: calc(100vh - 350px); /* 动态高度 */
 }
 
@@ -204,7 +204,8 @@ page {
 .scanline {
   position: absolute; top: 0; left: 0; right: 0; bottom: 0;
   background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.04) 50%);
-  background-size: 100% 4px; pointer-events: none; z-index: 10;
+  background-size: 100% 4px; pointer-events: none;
+  border-radius: inherit;
 }
 
 .grid-list {

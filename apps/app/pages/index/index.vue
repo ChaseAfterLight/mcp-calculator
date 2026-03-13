@@ -244,7 +244,7 @@ page {
   padding: 15px;
   box-shadow: inset 0 0 10px rgba(0,0,0,0.3);
   position: relative;
-  overflow: hidden;
+  /* 移除 overflow: hidden 解决 Safari/iOS 上的有时文字发虚、模糊问题 */
 }
 
 .scanline {
@@ -253,6 +253,7 @@ page {
   background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.04) 50%); /* 调低透明度提升清晰度 */
   background-size: 100% 4px;
   pointer-events: none;
+  border-radius: inherit; /* 让 scanline 继承圆角，代替 overflow: hidden */
 }
 
 .welcome-text { margin-bottom: 20px; position: relative; z-index: 1; }
