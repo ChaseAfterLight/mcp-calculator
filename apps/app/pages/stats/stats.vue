@@ -1,48 +1,68 @@
 <template>
-  <view class="container">
-    <view class="header">
-      <view class="welcome">
-        <text class="title">我的成就</text>
-        <text class="subtitle">记录你的探索点滴</text>
+  <view class="device-wrapper">
+
+    <!-- 主屏幕：LCD 绿色统计区 -->
+    <view class="screen-box">
+      <view class="lcd-screen">
+        <view class="scanline"></view>
+        <view class="lcd-header">
+          <text class="sys-time">系统时间: {{ currentTime }}</text>
+          <text class="sys-msg">运行状态: 正常_</text>
+        </view>
+        
+        <view v-if="stats" class="hud-stats">
+          <view class="hud-item main-hud">
+            <text class="hud-label">总研究点数 >></text>
+            <text class="hud-value bg-value">{{ String(stats.total_score || 0).padStart(5, '0') }}</text>
+          </view>
+          
+          <view class="hud-divider"></view>
+          
+          <view class="hud-sub-grid">
+            <view class="hud-item">
+              <text class="hud-label">物种记录</text>
+              <text class="hud-value">{{ String(stats.discoveries || 0).padStart(3, '0') }}</text>
+            </view>
+            <view class="hud-item">
+              <text class="hud-label">评级 MAX</text>
+              <text class="hud-value">LV.{{ computeMaxRarity() }}</text>
+            </view>
+          </view>
+        </view>
+
+        <view class="empty-lcd" v-else>
+          <text class="blinking-cursor">正在同步数据...</text>
+        </view>
       </view>
     </view>
 
-    <view v-if="stats" class="stats-overview">
-      <view class="overview-card primary-card">
-        <text class="card-title">总探索积分</text>
-        <text class="card-value">{{ stats.total_score || 0 }}</text>
+    <!-- 详细面板：带有物理质感的卡片 -->
+    <view class="panel-section">
+      <view class="panel-header">
+        <text class="panel-title">同步记录 // SYSTEM_LOGS</text>
       </view>
-      <view class="overview-card secondary-card">
-        <text class="card-title">发现物种数</text>
-        <text class="card-value">{{ stats.discoveries || 0 }}</text>
-      </view>
-    </view>
-
-    <view v-if="stats" class="achievements-list">
-      <view class="section-title">详细统计</view>
       
-      <view class="stat-list-item">
-        <view class="item-icon">🌟</view>
-        <view class="item-content">
-          <text class="item-name">最高稀有度</text>
-          <text class="item-desc">历史发现的最罕见物种级别</text>
+      <view class="module-list" v-if="stats">
+        <view class="hardware-module">
+          <view class="module-icon bg-yellow">★</view>
+          <view class="module-info">
+             <text class="mod-name">最高稀有度发现</text>
+             <text class="mod-desc">数据库收录的最高评级</text>
+          </view>
+          <view class="mod-data box-data">R:{{ computeMaxRarity() }}</view>
         </view>
-        <view class="item-value">{{ computeMaxRarity() }} ★</view>
-      </view>
 
-      <view class="stat-list-item">
-        <view class="item-icon">📅</view>
-        <view class="item-content">
-          <text class="item-name">最近发现</text>
-          <text class="item-desc">上一次记录新物种的时间</text>
+        <view class="hardware-module">
+          <view class="module-icon bg-blue">◎</view>
+          <view class="module-info">
+             <text class="mod-name">最后同步时间</text>
+             <text class="mod-desc">最近一次有效数据扫描</text>
+          </view>
+          <view class="mod-data border-data">{{ computeLastDiscovery() }}</view>
         </view>
-        <view class="item-value">{{ computeLastDiscovery() }}</view>
       </view>
     </view>
 
-    <view class="empty" v-if="!stats">
-      <text>正在加载成就数据...</text>
-    </view>
   </view>
 </template>
 
@@ -54,14 +74,19 @@ export default {
     return {
       userId: 'default',
       stats: null,
-      recentItems: []
+      currentTime: '00:00:00'
     }
   },
   onShow() {
     this.fetchStats();
-    this.fetchRecent();
+    this.updateTime();
+    setInterval(this.updateTime, 1000);
   },
   methods: {
+    updateTime() {
+      const d = new Date();
+      this.currentTime = `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}:${String(d.getSeconds()).padStart(2,'0')}`;
+    },
     async fetchStats() {
       try {
         const response = await uni.request({
@@ -76,75 +101,120 @@ export default {
         console.error(e);
       }
     },
-    async fetchRecent() {
-      try {
-        const response = await uni.request({
-          url: `${API_BASE}/species/search`,
-          data: { keyword: 'a', limit: 50 }
-        });
-        const res = Array.isArray(response) ? response[1] : response;
-        if (res?.data?.success) {
-          this.recentItems = res.data.data.results || [];
-        }
-      } catch(e) {}
-    },
     computeMaxRarity() {
-      if(!this.recentItems.length) return '-';
-      return Math.max(...this.recentItems.map(i => i.rarity || 1));
+      return String(this.stats?.max_rarity || 0);
     },
     computeLastDiscovery() {
-      if(!this.recentItems.length) return '-';
-      // Assume the first item in recent is the latest if backend sorted, else compute
-      const dates = this.recentItems.map(i => i.created_date ? new Date(i.created_date) : 0).filter(Boolean);
-      if(!dates.length) return '近期';
-      return new Date(Math.max(...dates)).toLocaleDateString();
+      const raw = this.stats?.latest_discovery?.generated_at || this.stats?.last_discovery_at;
+      if(!raw) return 'NONE';
+      const maxDate = new Date(raw);
+      if (Number.isNaN(maxDate.getTime())) return '近期';
+      return `${maxDate.getMonth()+1}/${maxDate.getDate()}`;
     }
   }
 }
 </script>
 
 <style lang="scss">
-page { background-color: #F3F4F6; }
-.container { padding-bottom: 20px; }
-
-.header {
-  background: linear-gradient(135deg, #059669 0%, #10B981 100%);
-  padding: 40px 20px 20px;
-  color: white;
+page { 
+  background-color: #A9262C; 
 }
-.title { font-size: 28px; font-weight: 800; display: block; margin-bottom: 5px; }
-.subtitle { font-size: 14px; opacity: 0.9; }
 
-.stats-overview {
-  display: flex; gap: 15px; padding: 20px; margin-top: -10px;
+.device-wrapper {
+  background-color: #D32F2F;
+  min-height: 100vh;
+  padding-bottom: 20px;
+  box-shadow: inset 0 0 20px rgba(0,0,0,0.3);
 }
-.overview-card {
-  flex: 1; border-radius: 16px; padding: 20px; display: flex; flex-direction: column;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+
+.device-header {
+  padding: 30px 20px 10px;
+  background: linear-gradient(180deg, #E53935 0%, #D32F2F 100%);
+  border-bottom: 3px solid #B71C1C;
 }
-.primary-card { background: white; border: 2px solid #059669; }
-.secondary-card { background: #059669; color: white; }
 
-.primary-card .card-title { color: #6B7280; font-size: 14px; }
-.primary-card .card-value { color: #059669; font-size: 28px; font-weight: bold; margin-top: 8px; }
+.header-leds { display: flex; align-items: center; gap: 15px; }
+.led { width: 16px; height: 16px; border-radius: 50%; border: 2px solid #212121; box-shadow: 0 2px 4px rgba(0,0,0,0.4); }
+.blue-led { background: radial-gradient(circle at 30% 30%, #4FC3F7, #0288D1); box-shadow: 0 0 8px #0288D1; }
+.glitch-title { font-size: 20px; font-weight: bold; color: #FFF; text-shadow: 2px 2px 0 #212121; }
 
-.secondary-card .card-title { opacity: 0.9; font-size: 14px; }
-.secondary-card .card-value { font-size: 28px; font-weight: bold; margin-top: 8px; }
-
-.achievements-list {
-  padding: 0 20px;
+/* 屏幕区域 */
+.screen-box {
+  background-color: #E0E0E0;
+  margin: 20px; padding: 15px;
+  border-radius: 12px; 
+  box-shadow: inset 0 2px 5px rgba(0,0,0,0.2), 0 5px 10px rgba(0,0,0,0.3);
+  border: 2px solid #757575;
 }
-.section-title { font-size: 18px; font-weight: bold; margin-bottom: 15px; }
 
-.stat-list-item {
-  background: white; padding: 15px; border-radius: 16px;
-  display: flex; align-items: center; margin-bottom: 15px;
+.lcd-screen {
+  background-color: #9BBC0F;
+  border-radius: 8px;
+  padding: 15px;
+  box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+  position: relative;
+  overflow: hidden;
 }
-.item-icon { font-size: 24px; margin-right: 15px; background: #FFFBEB; padding: 10px; border-radius: 12px; }
-.item-content { flex: 1; display: flex; flex-direction: column; }
-.item-name { font-size: 16px; font-weight: bold; color: #111827; }
-.item-desc { font-size: 12px; color: #6B7280; margin-top: 4px; }
-.item-value { font-size: 16px; font-weight: bold; color: #059669; }
 
-.empty { padding: 50px; text-align: center; color: #9CA3AF; }
+.scanline {
+  position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.04) 50%);
+  background-size: 100% 4px; pointer-events: none; z-index: 10;
+}
+
+.lcd-header {
+  display: flex; justify-content: space-between; border-bottom: 2px dashed #306230; padding-bottom: 5px; margin-bottom: 15px;
+  position: relative; z-index: 1;
+}
+.sys-time, .sys-msg { font-size: 10px; font-weight: bold; color: #306230; }
+
+.hud-stats { position: relative; z-index: 1; }
+.hud-item { display: flex; flex-direction: column; }
+.main-hud { margin-bottom: 15px; }
+.hud-label { font-size: 12px; font-weight: bold; color: #306230; margin-bottom: 5px; }
+.hud-value { font-size: 20px; font-weight: 900; color: #0F380F; }
+.bg-value { font-size: 32px; letter-spacing: 2px; }
+
+.hud-divider { height: 2px; background: #306230; margin-bottom: 15px; }
+
+.hud-sub-grid { display: flex; justify-content: space-between; }
+
+
+.empty-lcd { padding: 40px 0; text-align: center; color: #0F380F; font-size: 14px; position: relative; z-index: 1; }
+@keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+.blinking-cursor::after { content: '_'; animation: blink 1s step-end infinite; }
+
+/* 面板区域 */
+.panel-section {
+  background: #E0E0E0;
+  margin: 0 20px; padding: 15px; border-radius: 12px;
+  box-shadow: inset 0 2px 5px rgba(0,0,0,0.2), 0 4px 10px rgba(0,0,0,0.3);
+  border: 2px solid #757575;
+}
+.panel-header { border-bottom: 2px solid #9E9E9E; padding-bottom: 5px; margin-bottom: 15px; }
+.panel-title { font-size: 14px; font-weight: bold; color: #212121; }
+
+.module-list { display: flex; flex-direction: column; gap: 15px; }
+.hardware-module {
+  background: #FAFAFA; border: 2px solid #424242; border-radius: 8px;
+  padding: 12px; display: flex; align-items: center; gap: 12px;
+  box-shadow: 2px 2px 0 #424242;
+}
+
+.module-icon {
+  width: 40px; height: 40px; border-radius: 8px; border: 2px solid #212121;
+  display: flex; justify-content: center; align-items: center;
+  font-size: 20px; font-weight: bold; color: #212121;
+  box-shadow: inset 0 -2px 5px rgba(0,0,0,0.2);
+}
+.bg-yellow { background: #FFCA28; }
+.bg-blue { background: #29B6F6; }
+
+.module-info { flex: 1; display: flex; flex-direction: column; }
+.mod-name { font-size: 14px; font-weight: 900; color: #212121; margin-bottom: 2px; }
+.mod-desc { font-size: 10px; color: #616161; font-weight: bold; line-height: 1.2;}
+
+.mod-data { font-size: 14px; font-weight: bold; color: #212121; }
+.box-data { background: #E0E0E0; padding: 4px 8px; border: 2px solid #424242; box-shadow: 2px 2px 0 #424242; }
+.border-data { border-bottom: 2px dashed #424242; padding-bottom: 2px; }
 </style>

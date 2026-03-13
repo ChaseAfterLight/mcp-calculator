@@ -2,11 +2,11 @@
 	"pages": [
 		{
 			"path": "pages/index/index",
-			"style": { "navigationBarTitleText": "首页" }
+			"style": { "navigationBarTitleText": "生态终端" }
 		},
 		{
 			"path": "pages/library/library",
-			"style": { "navigationBarTitleText": "图鉴库" }
+			"style": { "navigationBarTitleText": "核心数据库" }
 		},
 		{
 			"path": "pages/register/register",
@@ -14,7 +14,7 @@
 		},
 		{
 			"path": "pages/stats/stats",
-			"style": { "navigationBarTitleText": "我的成就" }
+			"style": { "navigationBarTitleText": "数据分析" }
 		},
 		{
 			"path": "pages/detail/detail",
@@ -22,7 +22,7 @@
 		},
 		{
 			"path": "pages/timeline/timeline",
-			"style": { "navigationBarTitleText": "发现记录" }
+			"style": { "navigationBarTitleText": "时光日志" }
 		},
 		{
 			"path": "pages/share/share",
@@ -31,14 +31,14 @@
 	],
 	"globalStyle": {
 		"navigationBarTextStyle": "white",
-		"navigationBarTitleText": "物种图鉴",
-		"navigationBarBackgroundColor": "#059669",
-		"backgroundColor": "#F3F4F6"
+		"navigationBarTitleText": "生态终端",
+		"navigationBarBackgroundColor": "#B71C1C",
+		"backgroundColor": "#A9262C"
 	},
 	"tabBar": {
-		"color": "#6B7280",
-		"selectedColor": "#059669",
-		"backgroundColor": "#ffffff",
+		"color": "#757575",
+		"selectedColor": "#D32F2F",
+		"backgroundColor": "#F5F5F5",
 		"list": [
 			{
 				"pagePath": "pages/index/index",

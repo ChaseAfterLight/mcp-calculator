@@ -1,100 +1,104 @@
 <template>
-  <view class="container">
-    <view class="header" v-if="species">
-      <view class="title-section">
+  <view class="device-wrapper">
+    <!-- Header Controls -->
+    <view class="device-header">
+       <view class="header-leds">
+         <view class="led red-led blinking"></view>
+         <text class="glitch-title">深度分析模式 // ANALYSIS</text>
+       </view>
+       <view class="screen-btn" @click="goBack">
+          <text>◀ 退出</text>
+       </view>
+    </view>
+
+    <!-- Main Scanner Screen -->
+    <view class="hardware-screen bezel">
+      <view class="scanner-display">
+        <view class="scanline"></view>
+        <view class="crosshair-tl"></view>
+        <view class="crosshair-tr"></view>
+        <view class="crosshair-bl"></view>
+        <view class="crosshair-br"></view>
+        
+        <view class="img-container" v-if="species && species.image_url" @click="previewImage">
+          <image class="scan-target" :src="species.image_url" mode="aspectFill"></image>
+          <!-- HUD Overlays -->
+          <view class="hud-box target-hud">目标已锁定 // LOCKED</view>
+          <view class="hud-line"></view>
+        </view>
+        
+        <view v-else-if="loading" class="terminal-text">
+           <text class="blinking-cursor">正在扫描周围环境...</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- Data Panel / Specs -->
+    <view class="data-panel" v-if="species">
+      
+      <!-- ID Label -->
+      <view class="spec-plate primary-plate">
+        <view class="plate-top">
+          <text class="sys-id">档案编号: {{ cardId.slice(-8).toUpperCase() || 'UNKNOWN' }}</text>
+          <view class="rarity">评级: <text v-for="n in (species.rarity || 3)" :key="n" class="star">★</text></view>
+        </view>
         <text class="zh-name">{{ species.chinese_name }}</text>
         <text class="en-name">{{ species.latin_name }}</text>
+        <view class="tags-row mt-10">
+          <text class="hardware-tag type-bg">{{ getCategoryName(species.category) }}</text>
+          <text class="hardware-tag alert-bg" v-if="species.protection_level">保护等级: {{ species.protection_level }}</text>
+        </view>
       </view>
-      <view class="rarity">
-        <text v-for="n in (species.rarity || 3)" :key="n" class="star">★</text>
+
+      <!-- Grid Specs -->
+      <view class="spec-grid">
+        <view class="spec-box" v-if="species.habitat">
+          <text class="spec-lbl">HABITAT // 栖息地</text>
+          <text class="spec-val">{{ species.habitat }}</text>
+        </view>
+        <view class="spec-box" v-if="species.observation_season">
+          <text class="spec-lbl">SEASON // 周期</text>
+          <text class="spec-val">{{ species.observation_season }}</text>
+        </view>
+      </view>
+
+      <!-- Features Terminal Box -->
+      <view class="terminal-box" v-if="species.features && species.features.length">
+        <view class="term-header">>>> 观测到的生物特征</view>
+        <view class="term-body">
+          <text class="term-list" v-for="(feat, fIdx) in species.features" :key="fIdx">>- {{ feat }}</text>
+        </view>
+      </view>
+
+      <view class="terminal-box log-box" v-if="species.fun_fact">
+        <view class="term-header">>>> 观测备注</view>
+        <view class="term-body">
+          <text class="term-text">{{ species.fun_fact }}</text>
+        </view>
+      </view>
+
+      <!-- Hardware Action Panel -->
+      <view class="action-panel">
+         <text class="action-title">>>> 实体档案转换</text>
+         
+         <view class="card-preview-area" v-if="species.card_image_url" @click="previewCardImage">
+           <image class="holo-card" :src="species.card_image_url" mode="widthFix"></image>
+           <view class="holo-effect"></view>
+         </view>
+      </view>
+
+    </view>
+
+    <!-- Bottom Physical Buttons -->
+    <view class="physical-controls" v-if="species">
+      <view class="hardware-btn btn-print" @click="toShare">
+         <text class="btn-text">数据分享</text>
+      </view>
+      <view class="hardware-btn btn-regen" @click="regenerateCard">
+         <text class="btn-text">重新扫描</text>
       </view>
     </view>
 
-    <!-- Image Preview -->
-    <view class="image-section" v-if="species && species.image_url">
-      <image class="cover-image" :src="species.image_url" mode="aspectFill" @click="previewImage"></image>
-    </view>
-    
-    <view class="content-section" v-if="species">
-      <!-- Tags -->
-      <view class="tags-row">
-        <text class="tag category-tag">{{ getCategoryName(species.category) }}</text>
-        <text class="tag protection-tag" v-if="species.protection_level">{{ species.protection_level }}</text>
-      </view>
-
-      <!-- Basic Info -->
-      <view class="info-group">
-        <view class="info-item" v-if="species.habitat">
-          <text class="label">栖息地</text>
-          <text class="val">{{ species.habitat }}</text>
-        </view>
-        <view class="info-item" v-if="species.observation_season">
-          <text class="label">观察季节</text>
-          <text class="val">{{ species.observation_season }}</text>
-        </view>
-        <view class="info-item" v-if="species.created_at">
-          <text class="label">发现时间</text>
-          <text class="val">{{ formatDate(species.created_at) }}</text>
-        </view>
-      </view>
-
-      <!-- Features -->
-      <view class="section">
-        <text class="section-title">显著特征</text>
-        <view class="features-box">
-          <text class="feature" v-for="(feat, fIdx) in species.features" :key="fIdx">{{ feat }}</text>
-        </view>
-      </view>
-
-      <!-- Fun Fact -->
-      <view class="section" v-if="species.fun_fact">
-        <text class="section-title">趣味知识</text>
-        <view class="fact-box">
-          <text class="fact-icon">💡</text>
-          <text class="fact-text">{{ species.fun_fact }}</text>
-        </view>
-      </view>
-
-      <view class="section" v-if="species.card_image_url">
-        <text class="section-title">生成卡片</text>
-        <view class="card-preview-box" @click="previewCardImage">
-          <image class="card-preview-image" :src="species.card_image_url" mode="widthFix"></image>
-        </view>
-        <view class="inline-action" @click="previewCardImage">查看生成卡片</view>
-      </view>
-
-      <view class="section" v-if="species.author || species.license || species.faves_count">
-        <text class="section-title">图片来源</text>
-        <view class="info-group source-group">
-          <view class="info-item" v-if="species.author">
-            <text class="label">作者</text>
-            <text class="val source-val">{{ species.author }}</text>
-          </view>
-          <view class="info-item" v-if="species.license">
-            <text class="label">许可证</text>
-            <text class="val source-val">{{ formatLicense(species.license) }}</text>
-          </view>
-          <view class="info-item" v-if="species.faves_count">
-            <text class="label">收藏数</text>
-            <text class="val">{{ species.faves_count }}</text>
-          </view>
-          <view class="info-item" v-if="species.source_page_url">
-            <text class="label">来源页面</text>
-            <text class="val source-link" @click="openSourcePage">{{ species.source_page_url }}</text>
-          </view>
-        </view>
-      </view>
-    </view>
-
-    <!-- Actions -->
-    <view class="bottom-actions" v-if="species">
-      <view class="btn primary-btn" @click="toShare">分享 / 发送邮件</view>
-      <view class="btn secondary-btn" @click="regenerateCard">重新生成卡片</view>
-    </view>
-
-    <view v-if="!species && !loading" class="empty-state">
-      <text>加载失败或物种不存在</text>
-    </view>
   </view>
 </template>
 
@@ -129,6 +133,7 @@ export default {
     this.loading = false;
   },
   methods: {
+    goBack() { uni.navigateBack(); },
     async loadDetail() {
       try {
         const response = await uni.request({
@@ -160,22 +165,8 @@ export default {
       };
     },
     getCategoryName(val) {
-      const map = { plant: '植物 🌿', animal: '动物 🐾', mineral: '矿物 💎' };
-      return map[val] || val;
-    },
-    formatDate(dateStr) {
-      if (!dateStr) return '未知';
-      return new Date(dateStr).toLocaleString();
-    },
-    formatLicense(license) {
-      const map = {
-        'cc-by': 'CC BY',
-        'cc-by-nc': 'CC BY-NC',
-        'cc-by-sa': 'CC BY-SA',
-        'cc-by-nd': 'CC BY-ND',
-        'cc0': 'CC0'
-      };
-      return map[String(license).toLowerCase()] || license;
+      const map = { plant: '草本植物', animal: '野生生物', mineral: '无机矿石' };
+      return map[val] || val || '未知成分';
     },
     previewImage() {
       if (this.species && this.species.image_url) {
@@ -187,25 +178,13 @@ export default {
         uni.previewImage({ urls: [this.species.card_image_url] });
       }
     },
-    openSourcePage() {
-      if (!this.species?.source_page_url) return;
-      // eslint-disable-next-line no-undef
-      if (typeof plus !== 'undefined' && plus.runtime?.openURL) {
-        plus.runtime.openURL(this.species.source_page_url);
-        return;
-      }
-      uni.setClipboardData({
-        data: this.species.source_page_url,
-        success: () => uni.showToast({ title: '链接已复制', icon: 'none' })
-      });
-    },
     toShare() {
       uni.navigateTo({
         url: `/pages/share/share?card_id=${this.cardId}&chinese_name=${encodeURIComponent(this.species.chinese_name)}`
       });
     },
     async regenerateCard() {
-      uni.showLoading({ title: '重新生成中...' });
+      uni.showLoading({ title: '执行重新扫描...' });
       try {
         const response = await uni.request({
           url: `${API_BASE}/species/generate-card`,
@@ -227,13 +206,13 @@ export default {
         uni.hideLoading();
         if (res && res.data && res.data.success) {
           await this.loadDetail();
-          uni.showToast({ title: '卡片已更新', icon: 'success' });
+          uni.showToast({ title: '档案已更新', icon: 'success' });
         } else {
-          uni.showToast({ title: '生成失败', icon: 'none' });
+          uni.showToast({ title: '扫描失败', icon: 'none' });
         }
       } catch (e) {
         uni.hideLoading();
-        uni.showToast({ title: '网络错误', icon: 'none' });
+        uni.showToast({ title: '通讯中断', icon: 'none' });
       }
     },
     toImageUrl(imagePath) {
@@ -247,112 +226,146 @@ export default {
 </script>
 
 <style lang="scss">
-page { background-color: #F3F4F6; }
-.container { padding-bottom: 90px; }
-
-.header {
-  background: white;
-  padding: 20px;
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-}
-.title-section { display: flex; flex-direction: column; }
-.zh-name { font-size: 24px; font-weight: bold; color: #111827; }
-.en-name { font-size: 14px; color: #6B7280; font-style: italic; margin-top: 4px; }
-.star { color: #FBBF24; font-size: 16px; margin-left: 2px; }
-
-.image-section {
-  width: 100%;
-  height: 250px;
-  background: #E5E7EB;
-}
-.cover-image {
-  width: 100%;
-  height: 100%;
+page { 
+  background-color: #A9262C; 
 }
 
-.content-section {
-  padding: 20px;
-}
-.tags-row {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 20px;
-}
-.tag {
-  font-size: 12px; padding: 4px 12px; border-radius: 8px; font-weight: 500;
-}
-.category-tag { background: #Eef2ff; color: #4F46E5; }
-.protection-tag { background: #Fef2f2; color: #DC2626; }
-
-.info-group {
-  background: white; border-radius: 12px; padding: 15px; margin-bottom: 20px;
-}
-.source-group {
-  padding: 0;
-  margin-bottom: 0;
-}
-.info-item {
-  display: flex; justify-content: space-between; margin-bottom: 10px;
-  gap: 12px;
-}
-.info-item:last-child { margin-bottom: 0; }
-.label { color: #6B7280; font-size: 14px; }
-.val { color: #111827; font-size: 14px; font-weight: 500; }
-.source-val {
-  flex: 1;
-  text-align: right;
-  word-break: break-all;
-}
-.source-link {
-  flex: 1;
-  text-align: right;
-  color: #2563EB;
-  word-break: break-all;
+.device-wrapper {
+  background-color: #D32F2F;
+  min-height: 100vh;
+  padding-bottom: 90px;
+  box-shadow: inset 0 0 20px rgba(0,0,0,0.3);
 }
 
-.section {
-  background: white; border-radius: 12px; padding: 15px; margin-bottom: 20px;
-}
-.section-title { font-size: 16px; font-weight: bold; margin-bottom: 12px; display: block; }
-.features-box { display: flex; flex-wrap: wrap; gap: 8px; }
-.feature { background: #F3F4F6; color: #4B5563; padding: 6px 12px; border-radius: 20px; font-size: 13px; }
-
-.fact-box {
-  background: #Fffbeb; padding: 12px; border-radius: 12px; display: flex; align-items: flex-start;
-}
-.fact-icon { margin-right: 8px; }
-.fact-text { font-size: 14px; color: #92400e; line-height: 1.5; }
-.card-preview-box {
-  background: #F9FAFB;
-  border-radius: 12px;
-  overflow: hidden;
-}
-.card-preview-image {
-  width: 100%;
-  display: block;
-}
-.inline-action {
-  margin-top: 12px;
-  text-align: center;
-  color: #059669;
-  font-size: 14px;
-  font-weight: 600;
+.device-header {
+  padding: 40px 20px 15px;
+  background: linear-gradient(180deg, #E53935 0%, #D32F2F 100%);
+  border-bottom: 3px solid #B71C1C;
+  display: flex; justify-content: space-between; align-items: center;
 }
 
-.bottom-actions {
+.header-leds { display: flex; align-items: center; gap: 10px; }
+.led { width: 12px; height: 12px; border-radius: 50%; border: 1px solid #212121; }
+.red-led { background: #EF5350; box-shadow: 0 0 5px #EF5350; }
+@keyframes blinkled { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+.blinking { animation: blinkled 1s infinite; }
+
+.glitch-title { font-size: 16px; font-weight: bold; color: #FFF; text-shadow: 1px 1px 0 #212121; }
+
+.screen-btn {
+  background: #212121; border: 2px solid #000; padding: 4px 8px; border-radius: 4px;
+  color: #FFF; font-size: 10px; font-weight: bold; box-shadow: 0 2px 0 #000;
+}
+.screen-btn:active { transform: translateY(2px); box-shadow: 0 0 0 #000; }
+
+/* 扫描屏幕区域 */
+.hardware-screen {
+  background-color: #E0E0E0; margin: 15px 20px; padding: 10px;
+  border-radius: 12px; border: 2px solid #757575;
+  box-shadow: inset 0 2px 5px rgba(0,0,0,0.2), 0 5px 10px rgba(0,0,0,0.3);
+}
+
+.scanner-display {
+  background-color: #000; border-radius: 6px; position: relative;
+  height: 220px; overflow: hidden; border: 2px inset #424242;
+}
+
+.scanline {
+  position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 255, 0, 0.04) 50%);
+  background-size: 100% 4px; pointer-events: none; z-index: 10;
+}
+
+/* 屏幕四角瞄准星 */
+.crosshair-tl { position: absolute; top: 10px; left: 10px; border-top: 2px solid #0F0; border-left: 2px solid #0F0; width: 20px; height: 20px; z-index: 10;}
+.crosshair-tr { position: absolute; top: 10px; right: 10px; border-top: 2px solid #0F0; border-right: 2px solid #0F0; width: 20px; height: 20px; z-index: 10;}
+.crosshair-bl { position: absolute; bottom: 10px; left: 10px; border-bottom: 2px solid #0F0; border-left: 2px solid #0F0; width: 20px; height: 20px; z-index: 10;}
+.crosshair-br { position: absolute; bottom: 10px; right: 10px; border-bottom: 2px solid #0F0; border-right: 2px solid #0F0; width: 20px; height: 20px; z-index: 10;}
+
+.img-container { width: 100%; height: 100%; position: relative; }
+.scan-target { width: 100%; height: 100%; opacity: 0.9; }
+
+.hud-box { position: absolute; font-family: monospace; font-size: 10px; color: #0F0; background: rgba(0,255,0,0.2); padding: 2px 5px; border: 1px solid #0F0; z-index: 10;}
+.target-hud { bottom: 15px; left: 15px; }
+
+@keyframes scan-animate { 0% { top: 0; } 50% { top: 100%; } 100% { top: 0; } }
+.hud-line { position: absolute; top: 0; left: 0; width: 100%; height: 2px; background: rgba(0, 255, 0, 0.5); box-shadow: 0 0 10px #0F0; animation: scan-animate 3s linear infinite; z-index:9;}
+
+.terminal-text { padding: 30px; color: #0F0; font-size: 12px; font-weight: bold; position: relative; z-index:1;}
+
+/* 数据面板 */
+.data-panel { margin: 0 20px; }
+
+.spec-plate {
+  background: #E0E0E0; border: 2px solid #424242; box-shadow: 2px 2px 0 #424242;
+  border-radius: 6px; padding: 12px; margin-bottom: 15px;
+}
+.plate-top { display: flex; justify-content: space-between; border-bottom: 1px dashed #757575; padding-bottom: 5px; margin-bottom: 8px;}
+.sys-id { font-size: 10px; font-weight: bold; color: #616161; }
+.rarity { font-size: 10px; font-weight: bold; color: #D32F2F; }
+.star { margin-left:2px; }
+
+.zh-name { font-size: 20px; font-weight: 900; color: #212121; display: block; margin-bottom: 2px; }
+.en-name { font-size: 12px; color: #616161; font-weight: bold; display: block; }
+
+.mt-10 { margin-top: 10px; }
+.tags-row { display: flex; gap: 10px; }
+.hardware-tag { font-size: 10px; padding: 2px 8px; border-radius: 10px; font-weight: bold; color: white; border: 1px solid rgba(0,0,0,0.5); box-shadow: inset 0 1px 2px rgba(255,255,255,0.3); }
+.type-bg { background: #4FC3F7; color: #01579B; border-color: #0288D1; }
+.alert-bg { background: #EF5350; }
+
+.spec-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px; }
+.spec-box { background: #E0E0E0; border: 2px solid #424242; box-shadow: 2px 2px 0 #424242; padding: 8px; border-radius: 4px; display: flex; flex-direction: column;}
+.spec-lbl { font-size: 9px; font-weight: bold; color: #757575; margin-bottom: 4px; }
+.spec-val { font-size: 12px; font-weight: bold; color: #212121; }
+
+.terminal-box {
+  background: #0F380F; border: 2px solid #212121; border-radius: 6px; margin-bottom: 15px;
+  box-shadow: inset 0 0 10px rgba(0,0,0,0.8); padding: 10px;
+}
+.log-box { background: #424242; } /* 不同底色表示不同模块 */
+
+.term-header { color: #9BBC0F; font-size: 10px; font-weight: bold; margin-bottom: 8px; border-bottom: 1px solid #306230; padding-bottom: 4px; }
+.log-box .term-header { color: #FFCC00; border-bottom-color: #616161; }
+
+.term-body { display: flex; flex-direction: column; gap: 4px;}
+.term-list { color: #9BBC0F; font-size: 12px; font-weight: bold; }
+.term-text { color: #FFF; font-size: 12px; line-height: 1.4; font-weight: normal;}
+
+.action-panel {
+  background: #E0E0E0; border: 2px dashed #757575; padding: 12px; border-radius: 6px;
+  text-align: center; margin-bottom: 20px;
+}
+.action-title { font-size: 10px; font-weight: bold; color: #616161; display: block; margin-bottom: 10px; }
+
+.card-preview-area {
+  position: relative; border: 4px solid #212121; border-radius: 8px; overflow: hidden;
+  background: #000; box-shadow: 0 5px 15px rgba(0,0,0,0.5); display: inline-block; width: 80%;
+}
+.holo-card { width: 100%; display: block; }
+.holo-effect { position: absolute; top:0; left:0; right:0; bottom:0; background: linear-gradient(125deg, rgba(255,255,255,0.3) 0%, transparent 40%, rgba(255,255,255,0.1) 60%, transparent 100%); pointer-events: none;}
+
+/* 固定底部按钮 */
+.physical-controls {
   position: fixed; bottom: 0; left: 0; right: 0;
-  background: white; padding: 15px 20px;
+  background: #D32F2F; padding: 15px 20px;
   display: flex; gap: 15px;
-  box-shadow: 0 -4px 10px rgba(0,0,0,0.05);
-  padding-bottom: env(safe-area-inset-bottom);
+  box-shadow: 0 -4px 10px rgba(0,0,0,0.3); border-top: 3px solid #B71C1C;
+  padding-bottom: calc(15px + env(safe-area-inset-bottom)); z-index: 100;
 }
-.btn {
-  flex: 1; text-align: center; padding: 12px; border-radius: 12px; font-weight: 600; font-size: 15px;
-}
-.primary-btn { background: #059669; color: white; }
-.secondary-btn { background: #F3F4F6; color: #374151; }
 
-.empty-state { padding: 50px; text-align: center; color: #9CA3AF; }
+.hardware-btn {
+  flex: 1; padding: 12px 0; border-radius: 8px; text-align: center;
+  box-shadow: 0 4px 0 #111, 0 6px 10px rgba(0,0,0,0.3); border: 2px solid #212121;
+}
+.hardware-btn:active { transform: translateY(4px); box-shadow: 0 0 0 #000; }
+
+.btn-print { background: #1E88E5; }
+.btn-regen { background: #FFCA28; }
+
+.btn-text { color: #FFF; font-size: 14px; font-weight: 900; text-shadow: 1px 1px 0 #000; }
+.btn-regen .btn-text { color: #212121; text-shadow: none; }
+
+@keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+.blinking-cursor::after { content: '_'; animation: blink 1s step-end infinite; }
 </style>

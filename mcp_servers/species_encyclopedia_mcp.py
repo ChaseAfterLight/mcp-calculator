@@ -78,6 +78,22 @@ def load_metadata_by_card_id(card_id: str) -> dict | None:
     return None
 
 
+def load_all_species_details() -> list[dict]:
+    """加载全部物种详情，优先使用 metadata，缺失时回退到 index"""
+    index = load_index()
+    details: list[dict] = []
+
+    for card in index:
+        detail = load_metadata_by_card_id(card.get("card_id", ""))
+        if detail:
+            merged = {**card, **detail}
+        else:
+            merged = dict(card)
+        details.append(merged)
+
+    return details
+
+
 def generate_card_id(category, existing_ids):
     """生成新的卡片ID"""
     prefix_map = {"plant": "P", "animal": "A", "mineral": "M"}
@@ -242,15 +258,19 @@ def search_species(keyword: str, limit: int = 10) -> dict:
             if (keyword in card["chinese_name"] or
                     keyword_lower in card["latin_name"].lower() or
                     keyword_lower in card["category"]):
+                detail = load_metadata_by_card_id(card.get("card_id", ""))
+                merged = {**card, **detail} if detail else dict(card)
                 results.append({
-                    "card_id": card["card_id"],
-                    "chinese_name": card["chinese_name"],
-                    "latin_name": card["latin_name"],
-                    "category": card["category"],
-                    "generated_at": card.get("generated_at", ""),
-                    "image_path": card.get("image_path", ""),
-                    "card_generated": card.get("card_generated", False),
-                    "discovered_by": card.get("discovered_by", "")
+                    "card_id": merged.get("card_id", ""),
+                    "chinese_name": merged.get("chinese_name", ""),
+                    "latin_name": merged.get("latin_name", ""),
+                    "category": merged.get("category", ""),
+                    "generated_at": merged.get("generated_at", ""),
+                    "image_path": merged.get("image_path", ""),
+                    "source_image_path": merged.get("source_image_path", ""),
+                    "card_image_path": merged.get("card_image_path", merged.get("image_path", "")),
+                    "card_generated": merged.get("card_generated", False),
+                    "discovered_by": merged.get("discovered_by", "")
                 })
 
                 if len(results) >= limit:
@@ -305,6 +325,7 @@ def get_my_stats(user_id: str = "default") -> dict:
     try:
         scores = load_scores()
         index = load_index()
+        all_details = load_all_species_details()
 
         user_data = scores.get(user_id, {
             "total_score": 0,
@@ -312,12 +333,67 @@ def get_my_stats(user_id: str = "default") -> dict:
             "last_discovery_at": None
         })
 
+        user_species = [
+            item for item in all_details
+            if item.get("discovered_by", "default") == user_id
+        ]
+
+        category_counts = {"plant": 0, "animal": 0, "mineral": 0}
+        max_rarity = 0
+        latest_item = None
+        latest_time = 0.0
+
+        for item in user_species:
+            category = item.get("category")
+            if category in category_counts:
+                category_counts[category] += 1
+
+            rarity = int(item.get("rarity") or 0)
+            max_rarity = max(max_rarity, rarity)
+
+            raw_time = item.get("generated_at") or item.get("created_at") or item.get("last_discovery_at")
+            try:
+                item_time = datetime.fromisoformat(raw_time).timestamp() if raw_time else 0.0
+            except Exception:
+                item_time = 0.0
+            if item_time >= latest_time:
+                latest_time = item_time
+                latest_item = item
+
+        recent_discoveries = sorted(
+            user_species,
+            key=lambda item: item.get("generated_at") or item.get("created_at") or "",
+            reverse=True,
+        )[:5]
+
         return {
             "user_id": user_id,
             "total_score": user_data["total_score"],
             "discoveries": user_data["discoveries"],
             "last_discovery_at": user_data.get("last_discovery_at"),
             "total_species": len(index),
+            "max_rarity": max_rarity,
+            "category_counts": category_counts,
+            "latest_discovery": {
+                "card_id": latest_item.get("card_id", "") if latest_item else "",
+                "chinese_name": latest_item.get("chinese_name", "") if latest_item else "",
+                "latin_name": latest_item.get("latin_name", "") if latest_item else "",
+                "category": latest_item.get("category", "") if latest_item else "",
+                "generated_at": latest_item.get("generated_at", "") if latest_item else "",
+            },
+            "recent_discoveries": [
+                {
+                    "card_id": item.get("card_id", ""),
+                    "chinese_name": item.get("chinese_name", ""),
+                    "latin_name": item.get("latin_name", ""),
+                    "category": item.get("category", ""),
+                    "rarity": item.get("rarity", 0),
+                    "generated_at": item.get("generated_at", ""),
+                    "image_path": item.get("image_path", ""),
+                    "card_image_path": item.get("card_image_path", item.get("image_path", "")),
+                }
+                for item in recent_discoveries
+            ],
             "message": f"你已发现 {user_data['discoveries']} 个物种，获得 {user_data['total_score']} 积分"
         }
 
