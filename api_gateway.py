@@ -93,6 +93,7 @@ class RegisterSpeciesRequest(BaseModel):
 class GenerateCardRequest(BaseModel):
     model_config = ConfigDict(str_strip_whitespace=True)
 
+    card_id: str | None = None
     chinese_name: str = Field(..., min_length=1)
     latin_name: str = Field(..., min_length=1)
     features: list[str] = Field(..., min_length=1)
@@ -138,8 +139,8 @@ app = FastAPI(
 )
 
 cards_dir = Path(__file__).parent / "cards"
-if cards_dir.exists():
-    app.mount("/cards", StaticFiles(directory=str(cards_dir)), name="cards")
+cards_dir.mkdir(parents=True, exist_ok=True)
+app.mount("/cards", StaticFiles(directory=str(cards_dir)), name="cards")
 
 app.add_middleware(
     CORSMiddleware,

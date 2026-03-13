@@ -233,7 +233,10 @@ def search_species(keyword: str, limit: int = 10) -> dict:
                     "chinese_name": card["chinese_name"],
                     "latin_name": card["latin_name"],
                     "category": card["category"],
-                    "generated_at": card.get("generated_at", "")
+                    "generated_at": card.get("generated_at", ""),
+                    "image_path": card.get("image_path", ""),
+                    "card_generated": card.get("card_generated", False),
+                    "discovered_by": card.get("discovered_by", "")
                 })
 
                 if len(results) >= limit:

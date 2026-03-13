@@ -295,7 +295,11 @@ export default {
           this.fetchUserStats();
           this.loadRecent();
           // generate card
-          this.generateCard(payload);
+          const registerResult = res.data.data || {};
+          this.generateCard({
+            ...payload,
+            card_id: registerResult.card_id || ''
+          });
         } else {
           uni.showToast({ 
             title: res?.data?.error?.message || '记录失败', 
@@ -315,6 +319,7 @@ export default {
           url: `${API_BASE}/species/generate-card`,
           method: 'POST',
           data: {
+            card_id: species.card_id || "",
             chinese_name: species.chinese_name,
             latin_name: species.latin_name,
             features: species.features || ['未知'],
@@ -330,6 +335,7 @@ export default {
          uni.hideLoading();
         if (res && res.data && res.data.success) {
           const result = res.data.data || {};
+          species.card_id = result.card_id || species.card_id || '';
           const imagePath = result.image_path || '';
           const imageUrl = this.toImageUrl(imagePath);
           species.image_path = imagePath;

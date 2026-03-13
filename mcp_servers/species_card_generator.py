@@ -33,7 +33,8 @@ def generate_species_card(
         protection_level: str = "",
         fun_fact: str = "",
         image_path: str = None,
-        rarity: int = 3
+        rarity: int = 3,
+        card_id: str = None
 ) -> dict:
     """生成物种图鉴卡片
 
@@ -77,6 +78,7 @@ def generate_species_card(
 
         # 构建物种数据
         species_data = {
+            "card_id": card_id,
             "chinese_name": chinese_name,
             "latin_name": latin_name,
             "features": features,
