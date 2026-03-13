@@ -1,0 +1,19 @@
+{
+  "card_id": "A001",
+  "chinese_name": "红腹锦鸡_S42_T002",
+  "latin_name": "Chrysolophus pictus var.test42.002",
+  "features": [
+    "羽色鲜艳",
+    "尾羽较长",
+    "雄鸟头部金黄"
+  ],
+  "category": "animal",
+  "classification": {},
+  "habitat": "山地林区",
+  "observation_season": "春季",
+  "protection_level": "国家二级保护动物",
+  "fun_fact": "雄鸟在求偶时会展开颈羽",
+  "image_path": "cards\\images\\红腹锦鸡_S42_T002_A001.png",
+  "rarity": 4,
+  "generated_at": "2026-03-13T11:22:17.955133"
+}

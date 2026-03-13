@@ -53,7 +53,7 @@ python api_gateway.py
 - `GET /health` - 健康检查
 - `POST /api/species/register` - 注册物种
 - `POST /api/species/generate` 或 `POST /api/species/generate-card` - 生成图鉴卡片
-- `GET /api/species/search?keyword=...&limit=10` - 搜索图鉴
+- `GET /api/species/search?keyword=...&limit=50` - 搜索图鉴
 - `GET /api/users/{user_id}/stats` - 查询用户积分统计
 - `POST /api/species/email` - 发送图鉴卡片邮件
 

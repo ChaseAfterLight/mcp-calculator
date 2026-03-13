@@ -64,6 +64,20 @@ def save_scores(scores_data):
         json.dump(scores_data, f, ensure_ascii=False, indent=2)
 
 
+def load_metadata_by_card_id(card_id: str) -> dict | None:
+    """按 card_id 加载物种完整详情"""
+    if not METADATA_DIR.exists():
+        return None
+
+    for metadata_file in METADATA_DIR.glob(f"*_{card_id}.json"):
+        try:
+            with open(metadata_file, 'r', encoding='utf-8') as f:
+                return json.load(f)
+        except Exception as exc:
+            logger.warning("读取物种详情失败 %s: %s", metadata_file, exc)
+    return None
+
+
 def generate_card_id(category, existing_ids):
     """生成新的卡片ID"""
     prefix_map = {"plant": "P", "animal": "A", "mineral": "M"}
@@ -251,6 +265,28 @@ def search_species(keyword: str, limit: int = 10) -> dict:
     except Exception as e:
         logger.error(f"搜索物种时发生错误: {e}")
         return {"count": 0, "results": [], "error": str(e)}
+
+
+@mcp.tool()
+def get_species_detail(card_id: str) -> dict:
+    """根据 card_id 获取物种详情"""
+    try:
+        if not card_id:
+            return {"error": "缺少必需字段：card_id"}
+
+        detail = load_metadata_by_card_id(card_id)
+        if detail:
+            return detail
+
+        index = load_index()
+        for card in index:
+            if card.get("card_id") == card_id:
+                return card
+
+        return {"error": f"未找到物种详情: {card_id}"}
+    except Exception as e:
+        logger.error(f"获取物种详情时发生错误: {e}")
+        return {"error": str(e)}
 
 
 @mcp.tool()

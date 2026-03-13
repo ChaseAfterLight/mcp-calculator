@@ -1,0 +1,19 @@
+{
+  "card_id": "M001",
+  "chinese_name": "萤石_S42_T003",
+  "latin_name": "Fluorite var.test42.003",
+  "features": [
+    "常见紫绿条带",
+    "硬度较低",
+    "部分样品具荧光"
+  ],
+  "category": "mineral",
+  "classification": {},
+  "habitat": "热液矿脉",
+  "observation_season": "全年",
+  "protection_level": "",
+  "fun_fact": "萤石在紫外光下常出现明显荧光",
+  "image_path": "cards\\images\\萤石_S42_T003_M001.png",
+  "rarity": 2,
+  "generated_at": "2026-03-13T11:22:19.221082"
+}

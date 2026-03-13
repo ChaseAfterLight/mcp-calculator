@@ -14,7 +14,12 @@ from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from mcp_servers.species_card_email_service import send_species_card_email
 from mcp_servers.species_card_generator import generate_species_card
-from mcp_servers.species_encyclopedia_mcp import get_my_stats, register_species, search_species
+from mcp_servers.species_encyclopedia_mcp import (
+    get_my_stats,
+    get_species_detail,
+    register_species,
+    search_species,
+)
 
 
 load_dotenv()
@@ -27,7 +32,7 @@ logger = logging.getLogger("API_GATEWAY")
 
 _TOOL_LOCK = threading.RLock()
 _DEFAULT_CORS = "http://localhost:5173,http://localhost:8080"
-_MAX_SEARCH_LIMIT = int(os.getenv("GATEWAY_MAX_SEARCH_LIMIT", "50"))
+_MAX_SEARCH_LIMIT = int(os.getenv("GATEWAY_MAX_SEARCH_LIMIT", "100"))
 
 
 def _is_true(value: str) -> bool:
@@ -220,6 +225,15 @@ def api_search_species(
 ):
     result = _run_locked(search_species, keyword=keyword, limit=limit)
     _raise_if_tool_error(result, "MCP_SEARCH_ERROR")
+    return _ok(request, result)
+
+
+@app.get("/api/species/{card_id}")
+def api_get_species_detail(card_id: str, request: Request):
+    if not card_id.strip():
+        _error(400, "INVALID_CARD_ID", "card_id cannot be empty")
+    result = _run_locked(get_species_detail, card_id=card_id.strip())
+    _raise_if_tool_error(result, "MCP_SPECIES_DETAIL_ERROR")
     return _ok(request, result)
 
 

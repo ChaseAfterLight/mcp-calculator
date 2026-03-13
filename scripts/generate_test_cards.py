@@ -74,7 +74,7 @@ BASE_SPECIES = [
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Test species registration + card generation flow")
     parser.add_argument("--count", type=int, default=3, help="How many test species to process (default: 3)")
-    parser.add_argument("--user-id", default="test_user", help="User id used for score and discovery stats")
+    parser.add_argument("--user-id", default="default", help="User id used for score and discovery stats")
     parser.add_argument("--seed", type=int, default=42, help="Random seed for stable rarity/name generation")
     parser.add_argument("--clean", action="store_true", help="Remove existing cards directory before test")
     return parser.parse_args()

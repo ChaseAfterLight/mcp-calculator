@@ -1,0 +1,19 @@
+{
+  "card_id": "P001",
+  "chinese_name": "银杏_S42_T001",
+  "latin_name": "Ginkgo biloba var.test42.001",
+  "features": [
+    "扇形叶片",
+    "秋季金黄",
+    "种子有特殊气味"
+  ],
+  "category": "plant",
+  "classification": {},
+  "habitat": "城市公园、山区",
+  "observation_season": "秋季",
+  "protection_level": "国家二级保护植物",
+  "fun_fact": "银杏是古老孑遗植物，被称为活化石",
+  "image_path": "cards\\images\\银杏_S42_T001_P001.png",
+  "rarity": 5,
+  "generated_at": "2026-03-13T11:22:16.675061"
+}
