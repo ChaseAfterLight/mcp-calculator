@@ -36,6 +36,17 @@ pip install -r requirements.txt
 playwright install chromium
 ```
 
+可选配置：
+```bash
+copy .env.example .env
+```
+
+如果希望为首次生成的新物种卡片自动补一张在线图片，可在 `.env` 中配置：
+```env
+PIXABAY_API_KEY=你的_pixabay_key
+```
+未配置时，系统仍会优先尝试使用 iNaturalist 官方接口为动植物自动找图。
+
 2. 启动所有 MCP 服务：
 ```bash
 python mcp_pipe.py

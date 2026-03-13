@@ -1,0 +1,30 @@
+{
+  "card_id": "A001",
+  "chinese_name": "红腹锦鸡_最终重测",
+  "latin_name": "Chrysolophus pictus",
+  "features": [
+    "羽色鲜艳",
+    "尾羽较长",
+    "雄鸟头部金黄"
+  ],
+  "category": "animal",
+  "classification": {},
+  "habitat": "山地林区",
+  "observation_season": "春季",
+  "protection_level": "国家二级保护动物",
+  "fun_fact": "雄鸟在求偶时会展开颈羽",
+  "source_image_path": "cards\\source_images\\Chrysolophus_pictus_d3460870d7.jpeg",
+  "rarity": 4,
+  "provider": "inaturalist",
+  "image_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/233914195/large.jpeg",
+  "fallback_image_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/233914195/square.jpeg",
+  "source_page_url": "https://www.inaturalist.org/observations/137004333",
+  "license": "cc-by-nc",
+  "author": "(c) Xiaogang Zhou, some rights reserved (CC BY-NC)",
+  "title": "Chrysolophus pictus",
+  "faves_count": 6,
+  "votes_count": 6,
+  "image_path": "cards\\images\\红腹锦鸡_最终重测_A001.png",
+  "card_image_path": "cards\\images\\红腹锦鸡_最终重测_A001.png",
+  "generated_at": "2026-03-13T13:46:19.387972"
+}

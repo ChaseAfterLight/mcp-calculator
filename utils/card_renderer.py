@@ -1,3 +1,4 @@
+import base64
 import json
 from datetime import datetime
 from pathlib import Path
@@ -65,9 +66,31 @@ class CardRenderer:
                 return card
         return None
 
+    def _resolve_template_image_src(self, image_path):
+        if not image_path:
+            return None
+        if str(image_path).startswith(("http://", "https://", "file://")):
+            return str(image_path)
+        path = Path(image_path)
+        if not path.exists():
+            return None
+
+        suffix = path.suffix.lower()
+        mime_type = {
+            ".jpg": "image/jpeg",
+            ".jpeg": "image/jpeg",
+            ".png": "image/png",
+            ".webp": "image/webp",
+        }.get(suffix)
+        if not mime_type:
+            return path.resolve().as_uri()
+
+        return f"data:{mime_type};base64,{base64.b64encode(path.read_bytes()).decode('ascii')}"
+
     def _load_template_data(self, species_data, card_id):
         category = species_data.get("category", "plant")
         category_info = self.category_map.get(category, self.category_map["plant"])
+        source_image_path = species_data.get("source_image_path") or species_data.get("image_path")
 
         return {
             "card_id": card_id,
@@ -82,7 +105,7 @@ class CardRenderer:
             "protection_level": species_data.get("protection_level", ""),
             "fun_fact": species_data.get("fun_fact", ""),
             "rarity": species_data.get("rarity", 3),
-            "image_path": species_data.get("image_path", None),
+            "image_path": self._resolve_template_image_src(source_image_path),
         }
 
     def _render_html(self, template_data):
@@ -108,6 +131,7 @@ class CardRenderer:
             **species_data,
             "card_id": card_id,
             "image_path": str(image_path),
+            "card_image_path": str(image_path),
             "generated_at": datetime.now().isoformat(),
         }
 

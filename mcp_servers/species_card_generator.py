@@ -6,6 +6,7 @@ from pathlib import Path
 # 添加项目根目录到路径
 sys.path.insert(0, str(Path(__file__).parent.parent))
 from utils.card_renderer import CardRenderer
+from utils.species_image_provider import SpeciesImageProvider
 
 logger = logging.getLogger('SpeciesCardGenerator')
 
@@ -19,6 +20,7 @@ mcp = FastMCP("SpeciesCardGenerator")
 
 # 初始化渲染器
 renderer = CardRenderer()
+image_provider = SpeciesImageProvider()
 
 
 @mcp.tool()
@@ -76,6 +78,17 @@ def generate_species_card(
         if not (1 <= rarity <= 5):
             return {"success": False, "error": f"无效的稀有度: {rarity}，必须是 1-5"}
 
+        source_image_info = None
+        source_image_path = image_path
+        if not source_image_path:
+            source_image_info = image_provider.resolve(
+                chinese_name=chinese_name,
+                latin_name=latin_name,
+                category=category,
+            )
+            if source_image_info:
+                source_image_path = source_image_info.get("source_image_path")
+
         # 构建物种数据
         species_data = {
             "card_id": card_id,
@@ -88,15 +101,25 @@ def generate_species_card(
             "observation_season": observation_season,
             "protection_level": protection_level,
             "fun_fact": fun_fact,
-            "image_path": image_path,
+            "source_image_path": source_image_path,
             "rarity": rarity
         }
+        if source_image_info:
+            species_data.update(source_image_info)
 
         # 生成卡片
         result = renderer.generate_card(species_data)
 
         if result["success"]:
             logger.info(f"成功生成卡片: {result['card_id']} - {chinese_name}")
+            if source_image_info:
+                result["source_image"] = {
+                    "provider": source_image_info.get("provider", ""),
+                    "source_page_url": source_image_info.get("source_page_url", ""),
+                    "license": source_image_info.get("license", ""),
+                    "author": source_image_info.get("author", ""),
+                    "source_image_path": source_image_info.get("source_image_path", ""),
+                }
         else:
             logger.error(f"生成卡片失败: {result.get('error', 'Unknown error')}")
 

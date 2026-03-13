@@ -54,6 +54,36 @@
           <text class="fact-text">{{ species.fun_fact }}</text>
         </view>
       </view>
+
+      <view class="section" v-if="species.card_image_url">
+        <text class="section-title">生成卡片</text>
+        <view class="card-preview-box" @click="previewCardImage">
+          <image class="card-preview-image" :src="species.card_image_url" mode="widthFix"></image>
+        </view>
+        <view class="inline-action" @click="previewCardImage">查看生成卡片</view>
+      </view>
+
+      <view class="section" v-if="species.author || species.license || species.faves_count">
+        <text class="section-title">图片来源</text>
+        <view class="info-group source-group">
+          <view class="info-item" v-if="species.author">
+            <text class="label">作者</text>
+            <text class="val source-val">{{ species.author }}</text>
+          </view>
+          <view class="info-item" v-if="species.license">
+            <text class="label">许可证</text>
+            <text class="val source-val">{{ formatLicense(species.license) }}</text>
+          </view>
+          <view class="info-item" v-if="species.faves_count">
+            <text class="label">收藏数</text>
+            <text class="val">{{ species.faves_count }}</text>
+          </view>
+          <view class="info-item" v-if="species.source_page_url">
+            <text class="label">来源页面</text>
+            <text class="val source-link" @click="openSourcePage">{{ species.source_page_url }}</text>
+          </view>
+        </view>
+      </view>
     </view>
 
     <!-- Actions -->
@@ -120,10 +150,12 @@ export default {
     },
     normalizeSpecies(raw) {
       const species = raw || {};
+      const displayImagePath = species.source_image_path || species.image_path || '';
       return {
         ...species,
         features: Array.isArray(species.features) ? species.features : [],
-        image_url: species.image_url || this.toImageUrl(species.image_path),
+        image_url: this.toImageUrl(displayImagePath || species.image_url || ''),
+        card_image_url: this.toImageUrl(species.card_image_path || species.image_path || ''),
         created_at: species.created_at || species.generated_at || ''
       };
     },
@@ -135,10 +167,37 @@ export default {
       if (!dateStr) return '未知';
       return new Date(dateStr).toLocaleString();
     },
+    formatLicense(license) {
+      const map = {
+        'cc-by': 'CC BY',
+        'cc-by-nc': 'CC BY-NC',
+        'cc-by-sa': 'CC BY-SA',
+        'cc-by-nd': 'CC BY-ND',
+        'cc0': 'CC0'
+      };
+      return map[String(license).toLowerCase()] || license;
+    },
     previewImage() {
       if (this.species && this.species.image_url) {
         uni.previewImage({ urls: [this.species.image_url] });
       }
+    },
+    previewCardImage() {
+      if (this.species && this.species.card_image_url) {
+        uni.previewImage({ urls: [this.species.card_image_url] });
+      }
+    },
+    openSourcePage() {
+      if (!this.species?.source_page_url) return;
+      // eslint-disable-next-line no-undef
+      if (typeof plus !== 'undefined' && plus.runtime?.openURL) {
+        plus.runtime.openURL(this.species.source_page_url);
+        return;
+      }
+      uni.setClipboardData({
+        data: this.species.source_page_url,
+        success: () => uni.showToast({ title: '链接已复制', icon: 'none' })
+      });
     },
     toShare() {
       uni.navigateTo({
@@ -167,9 +226,7 @@ export default {
         const res = Array.isArray(response) ? response[1] : response;
         uni.hideLoading();
         if (res && res.data && res.data.success) {
-          const result = res.data.data || {};
-          this.species.image_path = result.image_path || '';
-          this.species.image_url = this.toImageUrl(this.species.image_path);
+          await this.loadDetail();
           uni.showToast({ title: '卡片已更新', icon: 'success' });
         } else {
           uni.showToast({ title: '生成失败', icon: 'none' });
@@ -232,12 +289,28 @@ page { background-color: #F3F4F6; }
 .info-group {
   background: white; border-radius: 12px; padding: 15px; margin-bottom: 20px;
 }
+.source-group {
+  padding: 0;
+  margin-bottom: 0;
+}
 .info-item {
   display: flex; justify-content: space-between; margin-bottom: 10px;
+  gap: 12px;
 }
 .info-item:last-child { margin-bottom: 0; }
 .label { color: #6B7280; font-size: 14px; }
 .val { color: #111827; font-size: 14px; font-weight: 500; }
+.source-val {
+  flex: 1;
+  text-align: right;
+  word-break: break-all;
+}
+.source-link {
+  flex: 1;
+  text-align: right;
+  color: #2563EB;
+  word-break: break-all;
+}
 
 .section {
   background: white; border-radius: 12px; padding: 15px; margin-bottom: 20px;
@@ -251,6 +324,22 @@ page { background-color: #F3F4F6; }
 }
 .fact-icon { margin-right: 8px; }
 .fact-text { font-size: 14px; color: #92400e; line-height: 1.5; }
+.card-preview-box {
+  background: #F9FAFB;
+  border-radius: 12px;
+  overflow: hidden;
+}
+.card-preview-image {
+  width: 100%;
+  display: block;
+}
+.inline-action {
+  margin-top: 12px;
+  text-align: center;
+  color: #059669;
+  font-size: 14px;
+  font-weight: 600;
+}
 
 .bottom-actions {
   position: fixed; bottom: 0; left: 0; right: 0;

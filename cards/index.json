@@ -1,32 +1,22 @@
 [
   {
     "card_id": "P001",
-    "chinese_name": "银杏_S42_T001",
-    "latin_name": "Ginkgo biloba var.test42.001",
+    "chinese_name": "银杏_最终重测",
+    "latin_name": "Ginkgo biloba",
     "category": "plant",
-    "generated_at": "2026-03-13T11:22:16.675990",
+    "generated_at": "2026-03-13T13:46:14.103612",
     "discovered_by": "default",
     "card_generated": true,
-    "image_path": "cards\\images\\银杏_S42_T001_P001.png"
+    "image_path": "cards\\images\\银杏_最终重测_P001.png"
   },
   {
     "card_id": "A001",
-    "chinese_name": "红腹锦鸡_S42_T002",
-    "latin_name": "Chrysolophus pictus var.test42.002",
+    "chinese_name": "红腹锦鸡_最终重测",
+    "latin_name": "Chrysolophus pictus",
     "category": "animal",
-    "generated_at": "2026-03-13T11:22:17.955933",
+    "generated_at": "2026-03-13T13:46:19.388732",
     "discovered_by": "default",
     "card_generated": true,
-    "image_path": "cards\\images\\红腹锦鸡_S42_T002_A001.png"
-  },
-  {
-    "card_id": "M001",
-    "chinese_name": "萤石_S42_T003",
-    "latin_name": "Fluorite var.test42.003",
-    "category": "mineral",
-    "generated_at": "2026-03-13T11:22:19.221910",
-    "discovered_by": "default",
-    "card_generated": true,
-    "image_path": "cards\\images\\萤石_S42_T003_M001.png"
+    "image_path": "cards\\images\\红腹锦鸡_最终重测_A001.png"
   }
 ]
