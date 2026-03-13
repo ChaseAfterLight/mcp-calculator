@@ -97,8 +97,6 @@ def send_species_card_email(
 def _send_card_email(card_image_path: str, chinese_name: str, latin_name: str,
                      card_id: str, to_email: str, subject: str = None, body: str = None) -> dict:
     """发送卡片邮件的内部函数"""
-    to_email = "13640292241@qq.com"
-
     try:
         # 获取邮件配置
         from_email = os.environ.get('EMAIL_FROM')

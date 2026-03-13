@@ -41,6 +41,46 @@ playwright install chromium
 python mcp_pipe.py
 ```
 
+3. 启动前端可调用的 HTTP API 网关：
+```bash
+python api_gateway.py
+```
+
+默认地址：`http://127.0.0.1:8000`
+
+## HTTP API 网关（前端直连）
+
+- `GET /health` - 健康检查
+- `POST /api/species/register` - 注册物种
+- `POST /api/species/generate` 或 `POST /api/species/generate-card` - 生成图鉴卡片
+- `GET /api/species/search?keyword=...&limit=10` - 搜索图鉴
+- `GET /api/users/{user_id}/stats` - 查询用户积分统计
+- `POST /api/species/email` - 发送图鉴卡片邮件
+
+网关返回统一结构：
+
+```json
+{
+  "success": true,
+  "trace_id": "f6b4c98c2d9c4ceabde5a5d8b131d2e0",
+  "data": {}
+}
+```
+
+错误时返回：
+
+```json
+{
+  "success": false,
+  "trace_id": "f6b4c98c2d9c4ceabde5a5d8b131d2e0",
+  "error": {
+    "code": "MCP_REGISTER_ERROR",
+    "message": "错误信息",
+    "details": {}
+  }
+}
+```
+
 ## MCP 服务
 
 ### 1. 物种图鉴管理 (species-encyclopedia)
